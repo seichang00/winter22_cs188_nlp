@@ -1,0 +1,22 @@
+{
+    "0": {
+        "id": 0,
+        "sentence": "I am a good boy.",
+        "label": 1
+    },
+    "1": {
+        "id": 1,
+        "sentence": "I am a good girl.",
+        "label": 1
+    },
+    "2": {
+        "id": 2,
+        "sentence": "I am a bad boy.",
+        "label": 0
+    },
+    "3": {
+        "id": 3,
+        "sentence": "I am a bad girl.",
+        "label": 0
+    }
+}
