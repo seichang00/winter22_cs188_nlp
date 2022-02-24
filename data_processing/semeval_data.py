@@ -50,7 +50,25 @@ class SemEvalDataProcessor(DataProcessor):
         #      examples.append(example_2)
         # For the guid, simply use the row number (0-
         # indexed) for each data instance.
-        raise NotImplementedError("Please finish the TODO!")
+        examples = list()
+        training_file = os.path.join(data_dir, split+".csv")
+        with open(training_file, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for i, row in enumerate(reader):
+                for label, statement in enumerate(['Incorrect Statement', 'Correct Statement']):
+                    examples.append(
+                        SemEvalSingleSentenceExample(
+                            str(i), 
+                            row[statement],
+                            label,
+                            row['Right Reason1'],
+                            row['Right Reason2'],
+                            row['Right Reason3'],
+                            row['Confusing Reason1'],
+                            row['Confusing Reason2']
+                        )
+                    )
+
         # End of TODO.
         ##################################################
 
