@@ -622,10 +622,10 @@ def main():
     # sequence classification model.
 
     # TODO: Huggingface configs.
-    config = AutoConfig.from_pretrained('bert-base-uncased') 
+    config = AutoConfig.from_pretrained('roberta-large') 
 
     # TODO: Tokenizer.
-    tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = AutoTokenizer.from_pretrained('roberta-large')
 
     # TODO: Defines the model.
     if args.training_phase == "pretrain":

@@ -50,22 +50,35 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     # Hint: you may find these functions handy: `torch.full`, Tensor's built-in
     # function `masked_fill_`, and `torch.bernoulli`.
     # Check the inputs to the bernoulli function and use other hinted functions
-    # to construct such inputs.
-    raise NotImplementedError("Please finish the TODO!")
+    # to construct such inputs.    
+    prob_tensor = torch.full(labels.size(), args.mlm_probability)
+    mask_samples = torch.bernoulli(prob_tensor)
 
     # Remember that the "non-masked" parts should be filled with ignore index.
-    raise NotImplementedError("Please finish the TODO!")
+    labels.masked_fill_(torch.logical_not(mask_samples), args.mlm_ignore_index)
+
 
     # For 80% of the time, we will replace masked input tokens with  the
     # tokenizer.mask_token (e.g. for BERT it is [MASK] for for RoBERTa it is
     # <mask>, check tokenizer documentation for more details)
-    raise NotImplementedError("Please finish the TODO!")
+    if np.random.binomial(1, 0.8):
+        inputs.masked_fill_(torch.gt(mask_samples, 0), tokenizer.convert_tokens_to_ids(tokenizer.mask_token))
 
     # For 10% of the time, we replace masked input tokens with random word.
     # Hint: you may find function `torch.randint` handy.
     # Hint: make sure that the random word replaced positions are not overlapping
     # with those of the masked positions, i.e. "~indices_replaced".
-    raise NotImplementedError("Please finish the TODO!")
+    elif np.random.binomial(1, 0.5):  # roll the remaining 20%
+        for i, row in enumerate(inputs):
+            for j, elem in enumerate(row):
+                k = elem
+                # check for masked token
+                if (mask_samples[i][j] == 1.):
+                    # loop until we get a different word from what we started with
+                    while k == elem:
+                        # random word from vocab
+                        k = torch.randint(tokenizer.vocab_size, (1,))[0]
+                    inputs[i][j] = k
 
     # End of TODO
     ##################################################
