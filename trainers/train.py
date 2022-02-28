@@ -625,16 +625,16 @@ def main():
     # sequence classification model.
 
     # TODO: Huggingface configs.
-    raise NotImplementedError("Please finish the TODO!")
+    config = AutoConfig.from_pretrained('roberta-large') 
 
     # TODO: Tokenizer.
-    raise NotImplementedError("Please finish the TODO!")
+    tokenizer = AutoTokenizer.from_pretrained('roberta-large')
 
     # TODO: Defines the model.
     if args.training_phase == "pretrain":
-        raise NotImplementedError("Please finish the TODO!")
+        model = AutoModelForMaskedLM.from_config(config)
     else:
-        raise NotImplementedError("Please finish the TODO!")
+        model = AutoModelForSequenceClassification.from_config(config)
 
     # End of TODO.
     ##################################################
