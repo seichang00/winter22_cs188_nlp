@@ -448,10 +448,10 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
         # Please also make your sci-kit learn scores able to take the
         # `args.score_average_method` for the `average` argument.
         else:
-            eval_acc = metrics.accuracy_score(labels, preds)
-            eval_prec = metrics.precision_score(labels, preds)
-            eval_recall = metrics.recall_score(labels, preds)
-            eval_f1 = metrics.f1_score(labels, preds)
+            eval_acc = accuracy_score(labels, preds)
+            eval_prec = precision_score(labels, preds, average=args.score_average_method)
+            eval_recall = recall_score(labels, preds, average=args.score_average_method)
+            eval_f1 = f1_score(labels, preds, average=args.score_average_method)
             # TODO: Pairwise accuracy.
             if args.task_name == "com2sense":
                 raise NotImplementedError("Please finish the TODO!")
