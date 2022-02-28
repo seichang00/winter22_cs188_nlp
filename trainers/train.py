@@ -442,13 +442,16 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
         # TODO: For `pretrain` phase, we only need to compute the
         # metric "perplexity", that is the exp of the eval_loss.
         if args.training_phase == "pretrain":
-            raise NotImplementedError("Please finish the TODO!")
+            eval_perplexity = 2 ** eval_loss
         # TODO: Please use the preds and labels to properly compute all
         # the following metrics: accuracy, precision, recall and F1-score.
         # Please also make your sci-kit learn scores able to take the
         # `args.score_average_method` for the `average` argument.
         else:
-            raise NotImplementedError("Please finish the TODO!")
+            eval_acc = metrics.accuracy_score(labels, preds)
+            eval_prec = metrics.precision_score(labels, preds)
+            eval_recall = metrics.recall_score(labels, preds)
+            eval_f1 = metrics.f1_score(labels, preds)
             # TODO: Pairwise accuracy.
             if args.task_name == "com2sense":
                 raise NotImplementedError("Please finish the TODO!")
@@ -622,16 +625,16 @@ def main():
     # sequence classification model.
 
     # TODO: Huggingface configs.
-    config = AutoConfig.from_pretrained('roberta-large') 
+    raise NotImplementedError("Please finish the TODO!")
 
     # TODO: Tokenizer.
-    tokenizer = AutoTokenizer.from_pretrained('roberta-large')
+    raise NotImplementedError("Please finish the TODO!")
 
     # TODO: Defines the model.
     if args.training_phase == "pretrain":
-        model = AutoModelForMaskedLM.from_config(config)
+        raise NotImplementedError("Please finish the TODO!")
     else:
-        model = AutoModelForSequenceClassification.from_config(config)
+        raise NotImplementedError("Please finish the TODO!")
 
     # End of TODO.
     ##################################################

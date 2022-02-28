@@ -207,7 +207,7 @@ class Com2SenseDataset(Dataset):
                 return input_ids, attention_mask, token_type_ids, guid
             return input_ids, attention_mask, token_type_ids, labels, guid
 
-        return input_ids, attention_mask, token_type_ids, labels
+        return input_ids, attention_mask, token_type_ids, labels, guid
 
 
 if __name__ == "__main__":
