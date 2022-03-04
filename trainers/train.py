@@ -219,15 +219,15 @@ def train(args, train_dataset, model, tokenizer):
             # TODO: Please finish the following training loop.
             # Make sure to make a special if-statement for
             # args.training_phase is `pretrain`.
-            raise NotImplementedError("Please finish the TODO!")
 
             if args.training_phase == "pretrain":
                 # TODO: Mask the input tokens.
-                raise NotImplementedError("Please finish the TODO!")
+                inputs["input_ids"], inputs["labels"] = mask_tokens(inputs["input_ids"], tokenizer, args)
 
             # TODO: See the HuggingFace transformers doc to properly get
             # the loss from the model outputs.
-            raise NotImplementedError("Please finish the TODO!")
+            outputs = model(inputs["input_ids"], inputs["attention_mask"], inputs["labels"])
+            loss = outputs[0]
 
             if args.n_gpu > 1:
                 # Applies mean() to average on multi-gpu parallel training.
@@ -235,10 +235,10 @@ def train(args, train_dataset, model, tokenizer):
 
             # Handles the `gradient_accumulation_steps`, i.e., every such
             # steps we update the model, so the loss needs to be devided.
-            raise NotImplementedError("Please finish the TODO!")
+            loss = loss/args.gradient_accumulation_steps
 
             # Loss backward.
-            raise NotImplementedError("Please finish the TODO!")
+            loss.backward()
 
             # End of TODO.
             ##################################################
@@ -382,21 +382,24 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
             # TODO: Please finish the following eval loop.
             # Make sure to make a special if-statement for
             # args.training_phase is `pretrain`.
-            raise NotImplementedError("Please finish the TODO!")
 
             if args.training_phase == "pretrain":
                 # TODO: Mask the input tokens.
-                raise NotImplementedError("Please finish the TODO!")
+                inputs["input_ids"], inputs["labels"] = mask_tokens(inputs["input_ids"], tokenizer, args)
 
             # TODO: See the HuggingFace transformers doc to properly get the loss
             # AND the logits from the model outputs, it can simply be 
             # indexing properly the outputs as tuples.
             # Make sure to perform a `.mean()` on the eval loss and add it
             # to the `eval_loss` variable.
-            raise NotImplementedError("Please finish the TODO!")
+            outputs = model(inputs["input_ids"], inputs["attention_mask"], inputs["labels"])
+            loss = outputs[0]
+            logits = outputs[1]
+
+            eval_loss += loss.mean().item()
 
             # TODO: Handles the logits with Softmax properly.
-            raise NotImplementedError("Please finish the TODO!")
+            preds = torch.nn.functional.softmax(logits, dim=-1)
 
             # End of TODO.
             ##################################################
@@ -631,6 +634,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained('roberta-large')
 
     # TODO: Defines the model.
+    # change to from_pretrained('model')
     if args.training_phase == "pretrain":
         model = AutoModelForMaskedLM.from_config(config)
     else:
