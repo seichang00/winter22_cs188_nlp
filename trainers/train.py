@@ -392,7 +392,7 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
             # indexing properly the outputs as tuples.
             # Make sure to perform a `.mean()` on the eval loss and add it
             # to the `eval_loss` variable.
-            outputs = model(inputs["input_ids"], inputs["attention_mask"], inputs["labels"])
+            outputs = model(inputs["input_ids"], inputs["attention_mask"], labels=inputs["labels"])
             loss = outputs[0]
             logits = outputs[1]
 
