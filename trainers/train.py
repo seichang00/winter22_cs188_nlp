@@ -226,7 +226,7 @@ def train(args, train_dataset, model, tokenizer):
 
             # TODO: See the HuggingFace transformers doc to properly get
             # the loss from the model outputs.
-            outputs = model(inputs["input_ids"], inputs["attention_mask"], labels=inputs["labels"])
+            outputs = model(**inputs)
             loss = outputs[0]
 
             if args.n_gpu > 1:
@@ -392,7 +392,7 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
             # indexing properly the outputs as tuples.
             # Make sure to perform a `.mean()` on the eval loss and add it
             # to the `eval_loss` variable.
-            outputs = model(inputs["input_ids"], inputs["attention_mask"], labels=inputs["labels"])
+            outputs = model(**inputs)
             loss = outputs[0]
             logits = outputs[1]
 
