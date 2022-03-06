@@ -627,11 +627,13 @@ def main():
     # `training_phase` is `pretrain` otherwise use the
     # sequence classification model.
 
+    model_name = 'bert-base-uncased'
+
     # TODO: Huggingface configs.
-    config = AutoConfig.from_pretrained('roberta-large') 
+    config = AutoConfig.from_pretrained(model_name) 
 
     # TODO: Tokenizer.
-    tokenizer = AutoTokenizer.from_pretrained('roberta-large')
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     # TODO: Defines the model.
     # change to from_pretrained('model')

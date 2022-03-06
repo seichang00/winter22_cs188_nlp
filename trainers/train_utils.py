@@ -54,6 +54,9 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     prob_tensor = torch.full(labels.size(), args.mlm_probability)
     mask_samples = torch.bernoulli(prob_tensor)
 
+    # move mask_samples to cuda
+    mask_samples = mask_samples.to(labels.device)
+
     # Remember that the "non-masked" parts should be filled with ignore index.
     labels.masked_fill_(torch.logical_not(mask_samples), args.mlm_ignore_index)
 
