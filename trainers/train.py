@@ -399,7 +399,7 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
             eval_loss += loss.mean().item()
 
             # TODO: Handles the logits with Softmax properly.
-            preds = torch.nn.functional.softmax(logits, dim=-1).detach().cpu().numpy()
+            logits = torch.nn.functional.softmax(logits, dim=-1)
 
             # End of TODO.
             ##################################################
