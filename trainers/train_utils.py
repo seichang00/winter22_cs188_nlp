@@ -54,7 +54,7 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     prob_tensor = torch.full(labels.size(), args.mlm_probability)
     mask_samples = torch.bernoulli(prob_tensor)
 
-    # move mask_samples to cuda
+        # move mask_samples to cuda
     mask_samples = mask_samples.to(labels.device)
 
     # Remember that the "non-masked" parts should be filled with ignore index.
@@ -65,6 +65,7 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     # tokenizer.mask_token (e.g. for BERT it is [MASK] for for RoBERTa it is
     # <mask>, check tokenizer documentation for more details)
     if np.random.binomial(1, 0.8):
+        # note: torch.gt is used to convert the mask into a boolean tensor
         inputs.masked_fill_(torch.gt(mask_samples, 0), tokenizer.convert_tokens_to_ids(tokenizer.mask_token))
 
     # For 10% of the time, we replace masked input tokens with random word.
@@ -72,7 +73,7 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     # Hint: make sure that the random word replaced positions are not overlapping
     # with those of the masked positions, i.e. "~indices_replaced".
     elif np.random.binomial(1, 0.5):  # roll the remaining 20%
-        for i, row in enumerate(inputs):
+        for i, row in enumerate(inputs.detach().cpu().numpy()):
             for j, elem in enumerate(row):
                 k = elem
                 # check for masked token
