@@ -214,7 +214,7 @@ class Com2SenseDataset(Dataset):
         # models (e.g. RoBERTa), please take special care
         # of it with an if-else statement.
         example = self.examples[idx]
-        guid = example.guid
+        guid = torch.Tensor([int(example.guid)]).long()
         text = example.text
 
         batch_encoding = self.tokenizer(
