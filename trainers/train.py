@@ -689,9 +689,9 @@ def main():
     # TODO: Defines the model.
     # change to from_pretrained('model')
     if args.training_phase == "pretrain":
-        model = AutoModelForMaskedLM.from_config(config)
+        model = AutoModelForMaskedLM.from_pretrained(args.model_name_or_path, config=config)
     else:
-        model = AutoModelForSequenceClassification.from_config(config)
+        model = AutoModelForSequenceClassification.from_pretrained(args.model_name_or_path, config=config)
 
     # End of TODO.
     ##################################################
