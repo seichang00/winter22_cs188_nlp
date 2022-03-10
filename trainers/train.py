@@ -309,7 +309,9 @@ def train(args, train_dataset, model, tokenizer):
                     # thus far evaluation results on the dev set.
                     output_dir = os.path.join(args.output_dir, "checkpoint-best")
                     output_best_file = os.path.join(output_dir, "checkpoint-best.txt")
-
+                    
+                    output_lines = []
+                    num_stored = 0
                     accuracy = -1
                     key = "{}_accuracy".format(args.task_name)
 
@@ -317,18 +319,45 @@ def train(args, train_dataset, model, tokenizer):
                         os.makedirs(output_dir, exist_ok=True)
                         print(output_dir)
                     
+                    # read checkpoint-best if it is already created, and get the
+                    # lowest accuracy.
                     if os.path.exists(output_best_file):
                         with open(output_best_file) as reader:
                             lines = reader.readlines()
                             for line in lines:
                                 words = line.split()
                                 if words[0] == key:
-                                    accuracy = float(words[2])
-                    if results[key] > accuracy:
+                                    num_stored += 1
+                                    # update accuracy
+                                    if accuracy == -1 or float(words[2]) < accuracy:
+                                        accuracy = float(words[2])
+                            # remove a stored item first if there are already 3.
+                            if results[key] > accuracy and num_stored == 3:
+                                i = 0
+                                checkpoint_removed = False
+                                while i < len(lines):
+                                    words = lines[i].split()
+                                    if words[0] == key and accuracy == float(words[2]) and not checkpoint_removed:
+                                        checkpoint_removed = True
+                                        output_lines = output_lines[:-2]
+                                        i += 1
+                                        while i < len(lines) and lines[i][:10] != "checkpoint":
+                                            i += 1
+                                    else:
+                                        output_lines.append(lines[i])
+                                        i += 1
+                            else:
+                                output_lines = lines
+                    
+                    if results[key] > accuracy or (results[key] == accuracy and num_stored < 3):
+                        # write to checkpoint-best
                         with open(output_best_file, "w") as writer:
-                            logger.info("new best checkpoint saved!")
+                            for line in output_lines:
+                                writer.write("{}".format(line))
+                            writer.write("checkpoint-{}\n".format(global_step))
                             for key in sorted(results.keys()):
                                 writer.write("%s = %s\n" % (key, str(results[key])))
+                            logger.info("new best checkpoint saved!")
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 epoch_iterator.close()
