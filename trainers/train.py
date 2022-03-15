@@ -417,10 +417,12 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
             # Make sure to perform a `.mean()` on the eval loss and add it
             # to the `eval_loss` variable.
             outputs = model(**inputs)
-            loss = outputs[0]
-            logits = outputs[1]
 
-            eval_loss += loss.mean().item()
+            loss = outputs.loss
+            logits = outputs.logits
+
+            if loss is not None:
+                eval_loss += loss.mean().item()
 
             # TODO: Handles the logits with Softmax properly.
             logits = torch.nn.functional.softmax(logits, dim=-1)
