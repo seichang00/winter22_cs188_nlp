@@ -9,6 +9,9 @@ from typing import List, Optional, Union
 
 import tqdm
 import numpy as np
+import nltk
+import re
+nltk.download('averaged_perceptron_tagger')
 
 import torch
 from transformers import (
@@ -19,7 +22,17 @@ from transformers import (
     AutoTokenizer,
 )
 
+# helper function that generates a list of tags for the input ids
+def tag_words(inputs, tokenizer):
+    tokens = []
+    for row in inputs.detach().cpu().numpy():
+        words = tokenizer.convert_ids_to_tokens(row)
+        tokens.append(nltk.pos_tag(words))
+    return tokens
 
+
+# Open-ended part: changed api by adding new pos_type parameter
+# Pass in a regex that matches to nltk's part-of-speech tags
 def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     """
     Prepare masked tokens inputs/labels for masked language modeling: 80% MASK,
@@ -51,7 +64,40 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
     # function `masked_fill_`, and `torch.bernoulli`.
     # Check the inputs to the bernoulli function and use other hinted functions
     # to construct such inputs.    
-    prob_tensor = torch.full(labels.size(), args.mlm_probability)
+
+    # Open-ended section: change masking logic to focus masking on a specific datatype
+    pos_type = args.mask_pos
+    if pos_type is not None:
+        pos_tags = tag_words(inputs, tokenizer)
+        pos_mask = torch.full(inputs.size(), 0)
+
+        for i, row in enumerate(pos_tags):
+            for j, (_, tag) in enumerate(row):
+                if re.match(pos_type, tag):
+                    pos_mask[i][j] = 1
+
+        # we only want to mask non-special tokens so we remove them with logic operations
+        pos_mask = torch.logical_and(pos_mask.bool(), torch.logical_not(special_tokens_mask))
+
+        # compute the proportion of the text made up by this tag
+        pos_hits = torch.sum(pos_mask).item()
+        pos_prob = pos_hits / pos_mask.numel()
+
+        # if the part of speech that we are targeting is sparse (less than mlm_probability)
+            # then mask all tokens with that POS
+            # else, sample such that the total mask samples is in proportion with mlm_probability
+        if pos_prob < args.mlm_probability:
+            pos_prob = 1
+        else:
+            pos_prob = args.mlm_probability / pos_prob
+
+        # fill the prob_tensor
+        prob_tensor = torch.full(inputs.size(), 0.0)
+        prob_tensor.masked_fill_(pos_mask, pos_prob)
+    else: 
+        prob_tensor = torch.full(labels.size(), args.mlm_probability)
+
+    # generate a random sample of the input tokens
     mask_samples = torch.bernoulli(prob_tensor)
 
         # move mask_samples to cuda
@@ -59,7 +105,6 @@ def mask_tokens(inputs, tokenizer, args, special_tokens_mask=None):
 
     # Remember that the "non-masked" parts should be filled with ignore index.
     labels.masked_fill_(torch.logical_not(mask_samples), args.mlm_ignore_index)
-
 
     # For 80% of the time, we will replace masked input tokens with  the
     # tokenizer.mask_token (e.g. for BERT it is [MASK] for for RoBERTa it is
@@ -151,7 +196,11 @@ if __name__ == "__main__":
     input_ids = torch.Tensor(input_ids).long().unsqueeze(0)
     
     inputs, labels = mask_tokens(input_ids, tokenizer, args,
-                                 special_tokens_mask=None)
+                                 special_tokens_mask=None, pos_type='NN*')
+
+    print(inputs)
+    print(labels)
+
     inputs, labels = list(inputs.numpy()[0]), list(labels.numpy()[0])
     ans_inputs = [101, 146, 103, 170, 103, 2377, 103, 146, 1567, 103, 2101, 119, 102]
     ans_labels = [-100, -100, 1821, -100, 1363, -100, 1105, -100, -100, 21239, -100, -100, -100]

@@ -216,6 +216,13 @@ def get_args():
         "--no_gene", action="store_true", 
         help="Set this flag if not using the gene and variation information."
     )
+    parser.add_argument(
+        "--mask_pos",
+        default=None,
+        type=str,
+        required=False,
+        help=("Open-ended question: a regex matching to the nltk part-of-speech tags that we target for masking"),
+    )
     args = parser.parse_args()
 
     return args
