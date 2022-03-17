@@ -13,6 +13,7 @@ from .utils import Coms2SenseSingleSentenceExample
 from transformers import (
     AutoTokenizer,
 )
+from sklearn.metrics import accuracy_score
 
 
 class Com2SenseDataProcessor(DataProcessor):
@@ -99,13 +100,71 @@ class Com2SenseDataProcessor(DataProcessor):
 
 
 if __name__ == "__main__":
-
     # Test loading data.
     proc = Com2SenseDataProcessor(data_dir="datasets/com2sense")
-    train_examples = proc.get_train_examples()
+    # train_examples = proc.get_train_examples()
     val_examples = proc.get_dev_examples()
-    test_examples = proc.get_test_examples()
-    print()
-    for i in range(3):
-        print(test_examples[i])
-    print()
+    # test_examples = proc.get_test_examples()
+    # print()
+    # for i in range(3):
+    #     print(test_examples[i])
+    # print()
+    
+    gt_domains = {}
+    gt_scenarios = {}
+    gt_numeracy = {True: [], False: []}
+    
+    pred_domains = {}
+    pred_scenarios = {}
+    pred_numeracy = {True: [], False: []}
+
+    for i, example in enumerate(val_examples):
+        if example.scenario not in gt_scenarios:
+            gt_scenarios[example.scenario] = []
+            pred_scenarios[example.scenario] = []
+        if example.domain not in gt_domains:
+            gt_domains[example.domain] = []
+            gt_scenarios[example.scenario] = []
+
+    pred_file = "outputs/com2sense/{}/ckpts/com2sense_predictions.txt".format("regular_bert-base-cased_epoch50")
+    predictions = []
+    with open(pred_file) as f:
+        for line in f:
+            predictions.append(line)
+
+    print(predictions[:3])
+    for i, example in enumerate(val_examples):
+        pred = predictions[i]
+        gt = example.label
+
+        #scenario
+        gt_scenarios[example.scenario].append(gt)
+        pred_scenarios[example.scenario].append(pred)
+
+        #domains
+        gt_domains[example.domain].append(gt)
+        pred_domains[example.domain].append(pred)
+
+        #numeracy
+        gt_numeracy[example.numeracy].append(gt)
+        pred_domains[example.numeracy].append(pred)
+    
+    print("domains:")
+    for domain in gt_domains:
+        print("{}: {}".format(domain, accuracy_score(gt_domains[domain], pred_domains[domain])))
+
+    print("scenarios:")
+    for scenario in gt_scenarios:
+        print("{}: {}".format(scenario, accuracy_score(gt_scenarios[scenario], pred_scenarios[scenario])))
+
+    print("numeracy:")
+    for boolean in [True, False]:
+        print("{}: {}".format(boolean, accuracy_score(gt_numeracy[boolean], pred_numeracy[boolean])))
+
+
+
+        
+        
+
+    
+    
