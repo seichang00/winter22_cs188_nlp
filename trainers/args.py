@@ -223,6 +223,11 @@ def get_args():
         required=False,
         help=("Open-ended question: a regex matching to the nltk part-of-speech tags that we target for masking"),
     )
+    parser.add_argument(
+        "--output_predictions",
+        action="store_true",
+        help="generate predictions file irrespective of testing on datasets without labels",
+    )
     args = parser.parse_args()
 
     return args

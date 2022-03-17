@@ -544,7 +544,7 @@ def evaluate(args, model, tokenizer, prefix="", data_split="test"):
                 writer.write("%s = %s\n" % (key, str(results[key])))
 
     # Stores the prediction .txt file to the `args.output_dir`.
-    if not has_label:
+    if not has_label or args.output_predictions:
         pred_file = os.path.join(args.output_dir, "com2sense_predictions.txt")
         pred_fo = open(pred_file, "w")
         for pred in preds:
