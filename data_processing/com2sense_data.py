@@ -124,13 +124,16 @@ if __name__ == "__main__":
             pred_scenarios[example.scenario] = []
         if example.domain not in gt_domains:
             gt_domains[example.domain] = []
-            gt_scenarios[example.scenario] = []
+            pred_domains[example.domain] = []
 
-    pred_file = "outputs/com2sense/{}/ckpts/com2sense_predictions.txt".format("regular_bert-base-cased_epoch50")
+    # change this to the location of your prediction file
+    #pred_file = "outputs/com2sense/{}/ckpts/com2sense_predictions.txt".format("regular_bert-base-cased_epoch50")
+    pred_file = "outputs/com2sense/ckpts/com2sense_predictions.txt"
+
     predictions = []
     with open(pred_file) as f:
         for line in f:
-            predictions.append(line)
+            predictions.append(int(line.strip()))
 
     print(predictions[:3])
     for i, example in enumerate(val_examples):
@@ -147,8 +150,8 @@ if __name__ == "__main__":
 
         #numeracy
         gt_numeracy[example.numeracy].append(gt)
-        pred_domains[example.numeracy].append(pred)
-    
+        pred_numeracy[example.numeracy].append(pred)
+
     print("domains:")
     for domain in gt_domains:
         print("{}: {}".format(domain, accuracy_score(gt_domains[domain], pred_domains[domain])))
